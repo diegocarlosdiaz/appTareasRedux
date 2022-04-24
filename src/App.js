@@ -1,24 +1,11 @@
 import React, { useEffect, useReducer } from 'react';
 import './App.css';
 import { tareasReducers } from './reducers/tareasReducers'
-import {useForm} from './hooks/useForm'
-
-/* const initialState = [
-  {
-    id: new Date().getTime(),
-    description: "Aprender Mongo",
-    done: false,
-  }
-] */
+import { AddTarea } from './components/AddTarea';
+import { ListTareas } from './components/ListTareas';
 
 const init = () => {
-   /* [
-    {
-      id: new Date().getTime(),
-      description: "Aprender Mongo",
-      done: false,
-    }
-  ] */
+ 
 
   return JSON.parse(localStorage.getItem('tareas')) || []
   
@@ -31,46 +18,38 @@ function App() {
 
   /* console.log(tareas); */
 
-  const [{description},handleInputChange, reset] = useForm({
-    description:"",
-  })
+ 
 
   useEffect(() => {
     localStorage.setItem('tareas', JSON.stringify(tareas))
   
    
   }, [tareas])
-  
-  
-  
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if(description.trim().length < 1) {
-      return
-    }
-    let nuevaTarea = 
-    {
-      id: new Date().getTime(),
-      description,
-      done: false,
-    }
-
-    const agregarTarea = {
-      type:'agregar' ,
+  const handleAdd = (nuevaTarea) => {
+    const agregarTarea= {
+      type:"agregar",
       payload: nuevaTarea
     }
-    dispatch(agregarTarea);
-
-    reset()
+    dispatch(agregarTarea)
   }
-
+  
   const handleDelete = (id) => {
+    //action de borrar
   const borrarTarea = {
     type:"borrar",
     payload: id
   }
   dispatch(borrarTarea)
+  }
+
+  const handleUpdate = (id) => {
+    const updateTarea = {
+      type: 'update',
+      payload:id
+    }
+
+    dispatch(updateTarea)
   }
   
   
@@ -85,47 +64,16 @@ function App() {
       <hr />
       <div className='row'>
         <div className='col-7'>
-          <ul className='list-group list-group-flush px-4'>
-
-            {tareas.map(({ description, done, id  }, i) => (
-
-              <li
-                key={description + i}
-                className='d-flex justify-content-between
-                 align-items-center'>
-                <p>
-                  {i + 1}. {description}
-                </p>
-                <button
-                  className='btn btn-sm btn-danger mb-1'
-                  onClick={() => handleDelete(id)}
-                >
-                  <i className='fas fa-trash-alt'></i>
-                </button>
-              </li>
-
-            ))}
-          </ul>
+         <ListTareas
+         tareas={tareas}
+         handleDelete={handleDelete}
+         handleUpdate={handleUpdate}
+         />
         </div>
         <div className='col-5'>
-
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name='description'
-              placeholder='Aprender...'
-              autoComplete='off'
-              className='form-control'
-              value={description} 
-              onChange={handleInputChange}
-
-            />
-            <button
-              type="submit"
-              className='btn btn-primary w-100 mt-2'>
-              Agregar
-            </button>
-          </form>
+          <AddTarea
+          handleAdd={handleAdd}
+          />
         </div>
       </div>
     </div>
